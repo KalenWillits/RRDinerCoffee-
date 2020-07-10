@@ -219,10 +219,8 @@ plt.show()
 # ### 3. Get the subset of coffeeData with null values in the Decision column, and save that subset as Prediction
 # %% codecell
 # Get just those rows whose value for the Decision column is null
-Prediction = coffeeData[pd.isnull(coffeeData["Decision"])]
-
-#coffeeData['Decision'].replace(to_replace=np.NaN, value=0, inplace=True)
-#Prediction = coffeeData[coffeeData['Decision'] == 0]['Decision']
+coffeeData['Decision'].replace(to_replace=np.NaN, value=0, inplace=True)
+Prediction = coffeeData[coffeeData['Decision'] == 0]['Decision']
 Prediction.head()
 # %% codecell
 # Call describe() on Prediction
@@ -237,7 +235,7 @@ NoPrediction.columns
 # Let's do our feature selection.
 # Make a variable called 'features', and a list containing the strings of every column except "Decision"
 
-features = ['Gender', 'num_coffeeBags_per_year', 'spent_last_week',
+features = ['Age', 'Gender', 'num_coffeeBags_per_year', 'spent_last_week',
        'spent_last_month', 'salary', 'Distance', 'Online']
 
 # Make an explanatory variable called X, and assign it: NoPrediction[features]
@@ -256,6 +254,7 @@ X_train, y_train, X_test, y_test = train_test_split(X, y, test_size=0.25, random
 # %% codecell
 # One-hot encode all features in training set.
 X_train = pd.get_dummies(X_train, dtype=float)
+y_train = pd.get_dummies(y_train, dtype=float)
 # y_train = pd.get_dummies(y_train)
 # Do the same, but for X_test
 X_test = pd.get_dummies(X_test)
@@ -281,7 +280,7 @@ X_test = pd.get_dummies(X_test)
 y_train.head()
 entr_model = tree.DecisionTreeClassifier(criterion="entropy", random_state = 1234)
 # Call fit() on entr_model
-y_train = y_train.astype('float64')
+X_train.info()
 entr_model.fit(X_train, y_train)
 X_train.head()
 # Call predict() on entr_model with X_test passed to it, and assign the result to a variable y_pred
