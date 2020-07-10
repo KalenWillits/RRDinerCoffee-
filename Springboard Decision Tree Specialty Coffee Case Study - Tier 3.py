@@ -113,7 +113,7 @@ coffeeData.shape
 coffeeData.info()
 # %% codecell
 # Call describe() on your data to get the relevant summary statistics for your data
-coffeeData.describe()
+coffeeData.describe(include='all')
 # %% markdown
 # # 2. Cleaning, transforming, and visualizing
 # ## 2a. Cleaning the data
@@ -127,18 +127,14 @@ coffeeData.columns
 
 # %% codecell
 # Make the relevant name changes to spent_week and spent_per_week.
-rename_map = {
-    'spent_week':'spent_last_week',
-    'spent_month': 'spent_last_month',
-    'SlrAY': 'salary'
-}
-coffeeData = coffeeData.rename(rename_map, axis=1)
+coffeeData.rename(columns = {"spent_month":"spent_last_month", "spent_week":"spent_last_week", "SlrAY":"Salary"},
+            inplace = True)
 # %% codecell
 # Check out the column names
 coffeeData.columns
 # %% codecell
 # Let's have a closer look at the gender column. Its values need cleaning.
-coffeeData['Gender'].isna().sum()
+coffeeData['Gender'].describe()
 # %% codecell
 # See the gender column's unique values
 coffeeData['Gender'].unique()
@@ -151,13 +147,13 @@ alt_male =  ['MALE', 'male', 'M']
 # Use replace() to make the values of the `gender` column just `Female` and `Male`.
 # %% codecell
 # Replace all alternate values for the Female entry with 'Female'
-coffeeData['Gender'].replace(to_replace=alt_female, value='Female', inplace=True)
+coffeeData['Gender'].replace(alt_female, 'Female', inplace=True)
 # %% codecell
 # Check out the unique values for the 'gender' column
 coffeeData['Gender'].unique()
 
 # %% codecell
-coffeeData['Gender'].replace(to_replace=alt_male, value='Male', inplace=True)
+coffeeData['Gender'].replace(alt_male,'Male', inplace=True)
 
 # %% codecell
 # Let's check the unique values of the column "gender"
@@ -170,8 +166,8 @@ coffeeData['Decision'].unique()
 # We now want to replace `1.0` and `0.0` in the `Decision` column by `YES` and `NO` respectively.
 # %% codecell
 # Replace 'Yes' and 'No' by 1 and 0
-coffeeData['Decision'].replace(to_replace=1.0, value='YES', inplace=True)
-coffeeData['Decision'].replace(to_replace=0.0, value='NO', inplace=True)
+coffeeData['Decision'].replace(1.0, value='YES', inplace=True)
+coffeeData['Decision'].replace(0.0, 'NO', inplace=True)
 
 # %% codecell
 # Check that our replacing those values with 'YES' and 'NO' worked, with unique()
@@ -190,8 +186,8 @@ coffeeData['Decision'].unique()
 # NoPrediction will contain all known values for the decision
 # Call dropna() on coffeeData, and store the result in a variable NOPrediction
 # Call describe() on the Decision column of NoPrediction after calling dropna() on coffeeData
-NoPrediction = coffeeData.dropna()
-NoPrediction['Decision'].describe()
+NOPrediction = coffeeData.dropna()
+NOPrediction['Decision'].describe()
 # %% markdown
 # ### 2. Visualize the data using scatter and boxplots of several variables in the y-axis and the decision on the x-axis
 # %% codecell
@@ -219,8 +215,7 @@ plt.show()
 # ### 3. Get the subset of coffeeData with null values in the Decision column, and save that subset as Prediction
 # %% codecell
 # Get just those rows whose value for the Decision column is null
-coffeeData['Decision'].replace(to_replace=np.NaN, value=0, inplace=True)
-Prediction = coffeeData[coffeeData['Decision'] == 0]['Decision']
+Prediction = coffeeData[pd.isnull(coffeeData["Decision"])]
 Prediction.head()
 # %% codecell
 # Call describe() on Prediction
@@ -230,19 +225,19 @@ Prediction.describe()
 # ### 4. Divide the NOPrediction subset into X and y
 # %% codecell
 # Check the names of the columns of NOPrediction
-NoPrediction.columns
+NOPrediction.columns
 # %% codecell
 # Let's do our feature selection.
 # Make a variable called 'features', and a list containing the strings of every column except "Decision"
 
-features = ['Age', 'Gender', 'num_coffeeBags_per_year', 'spent_last_week',
-       'spent_last_month', 'salary', 'Distance', 'Online']
+features = ["Age", "Gender", "num_coffeeBags_per_year", "spent_last_week", "spent_last_month",
+       "Salary", "Distance", "Online"]
 
 # Make an explanatory variable called X, and assign it: NoPrediction[features]
-X = NoPrediction[features]
+X = NOPrediction[features]
 
 # Make a dependent variable called y, and assign it: NoPrediction.Decision
-y = NoPrediction['Decision']
+y = NOPrediction.Decision
 # %% markdown
 # ### 4. Further divide those subsets into train and test subsets for X and y respectively: X_train, X_test, y_train, y_test
 # %% codecell
@@ -253,11 +248,12 @@ X_train, y_train, X_test, y_test = train_test_split(X, y, test_size=0.25, random
 # One-hot encoding replaces each unique value of a given column with a new column, and puts a 1 in the new column for a given row just if its initial value for the original column matches the new column. Check out [this resource](https://hackernoon.com/what-is-one-hot-encoding-why-and-when-do-you-have-to-use-it-e3c6186d008f) if you haven't seen one-hot-encoding before.
 # %% codecell
 # One-hot encode all features in training set.
-X_train = pd.get_dummies(X_train, dtype=float)
-y_train = pd.get_dummies(y_train, dtype=float)
+X_train = pd.get_dummies(X_train)
+y_train = pd.get_dummies(y_train)
 # y_train = pd.get_dummies(y_train)
 # Do the same, but for X_test
 X_test = pd.get_dummies(X_test)
+
 # %% markdown
 # # 3. Modeling
 # It's useful to look at the scikit-learn documentation on decision trees https://scikit-learn.org/stable/modules/tree.html before launching into applying them. If you haven't seen them before, take a look at that link, in particular the section `1.10.5.`
@@ -277,7 +273,7 @@ X_test = pd.get_dummies(X_test)
 # The first model will be the hardest. Persevere and you'll reap the rewards: you can use almost exactly the same code for the other models.
 # %% codecell
 # Declare a variable called entr_model and use tree.DecisionTreeClassifier.
-y_train.head()
+y_train.info()
 entr_model = tree.DecisionTreeClassifier(criterion="entropy", random_state = 1234)
 # Call fit() on entr_model
 X_train.info()
