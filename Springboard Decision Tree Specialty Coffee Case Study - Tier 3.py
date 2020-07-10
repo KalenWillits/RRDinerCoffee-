@@ -157,7 +157,6 @@ coffeeData['Gender'].replace(to_replace=alt_female, value='Female', inplace=True
 coffeeData['Gender'].unique()
 
 # %% codecell
-# Replace all alternate values with "Male"
 coffeeData['Gender'].replace(to_replace=alt_male, value='Male', inplace=True)
 
 # %% codecell
@@ -220,12 +219,15 @@ plt.show()
 # ### 3. Get the subset of coffeeData with null values in the Decision column, and save that subset as Prediction
 # %% codecell
 # Get just those rows whose value for the Decision column is null
-coffeeData['Decision'].replace(to_replace=np.NaN, value=0, inplace=True)
-Prediction = coffeeData[coffeeData['Decision'] == 0]['Decision']
+Prediction = coffeeData[pd.isnull(coffeeData["Decision"])]
+
+#coffeeData['Decision'].replace(to_replace=np.NaN, value=0, inplace=True)
+#Prediction = coffeeData[coffeeData['Decision'] == 0]['Decision']
 Prediction.head()
 # %% codecell
 # Call describe() on Prediction
 Prediction.describe()
+
 # %% markdown
 # ### 4. Divide the NOPrediction subset into X and y
 # %% codecell
@@ -234,6 +236,7 @@ NoPrediction.columns
 # %% codecell
 # Let's do our feature selection.
 # Make a variable called 'features', and a list containing the strings of every column except "Decision"
+
 features = ['Age', 'Gender', 'num_coffeeBags_per_year', 'spent_last_week',
        'spent_last_month', 'salary', 'Distance', 'Online']
 
@@ -252,12 +255,12 @@ X_train, y_train, X_test, y_test = train_test_split(X, y, test_size=0.25, random
 # One-hot encoding replaces each unique value of a given column with a new column, and puts a 1 in the new column for a given row just if its initial value for the original column matches the new column. Check out [this resource](https://hackernoon.com/what-is-one-hot-encoding-why-and-when-do-you-have-to-use-it-e3c6186d008f) if you haven't seen one-hot-encoding before.
 # %% codecell
 # One-hot encode all features in training set.
-X_train = pd.get_dummies(X_train)
-y_train = pd.get_dummies(y_train)
+X_train = pd.get_dummies(X_train, dtype=float)
+# y_train = pd.get_dummies(y_train)
 # Do the same, but for X_test
 X_test = pd.get_dummies(X_test)
 # %% markdown
-# # 3. Modeling.iloc[:,1]
+# # 3. Modeling
 # It's useful to look at the scikit-learn documentation on decision trees https://scikit-learn.org/stable/modules/tree.html before launching into applying them. If you haven't seen them before, take a look at that link, in particular the section `1.10.5.`
 # %% markdown
 # ## Model 1: Entropy model - no max_depth
@@ -278,9 +281,8 @@ X_test = pd.get_dummies(X_test)
 y_train.head()
 entr_model = tree.DecisionTreeClassifier(criterion="entropy", random_state = 1234)
 # Call fit() on entr_model
-#X_train.info()
-#y_train.info()
-entr_model.fit(X_train, y_train, check_input=False)
+y_train = y_train.astype('float64')
+entr_model.fit(X_train, y_train)
 X_train.head()
 # Call predict() on entr_model with X_test passed to it, and assign the result to a variable y_pred
 _ _ _
