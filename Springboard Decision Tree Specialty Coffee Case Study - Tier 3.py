@@ -237,7 +237,7 @@ NoPrediction.columns
 # Let's do our feature selection.
 # Make a variable called 'features', and a list containing the strings of every column except "Decision"
 
-features = ['Age', 'Gender', 'num_coffeeBags_per_year', 'spent_last_week',
+features = ['Gender', 'num_coffeeBags_per_year', 'spent_last_week',
        'spent_last_month', 'salary', 'Distance', 'Online']
 
 # Make an explanatory variable called X, and assign it: NoPrediction[features]
