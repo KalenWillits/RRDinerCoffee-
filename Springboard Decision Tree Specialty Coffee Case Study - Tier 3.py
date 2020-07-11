@@ -244,7 +244,8 @@ y = NOPrediction['Decision']
 # ### 4. Further divide those subsets into train and test subsets for X and y respectively: X_train, X_test, y_train, y_test
 # %% codecell
 # Call train_test_split on X, y. Make the test_size = 0.25, and random_state = 246
-X_train, y_train, X_test, y_test = train_test_split(X, y, test_size=0.25, random_state=246)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=246)
+
 # %% markdown
 # ### 5. Create dummy variables to deal with categorical inputs
 # One-hot encoding replaces each unique value of a given column with a new column, and puts a 1 in the new column for a given row just if its initial value for the original column matches the new column. Check out [this resource](https://hackernoon.com/what-is-one-hot-encoding-why-and-when-do-you-have-to-use-it-e3c6186d008f) if you haven't seen one-hot-encoding before.
@@ -277,10 +278,10 @@ X_test = pd.get_dummies(X_test)
 # Declare a variable called entr_model and use tree.DecisionTreeClassifier.
 entr_model = tree.DecisionTreeClassifier(criterion="entropy", random_state = 1234)
 # Call fit() on entr_model
-entr_model.fit(X_train.astype(str).iloc[0:119], y_train.astype(str))
+entr_model.fit(X_train.values.reshape(-1, 1), y_train)
 
 # Call predict() on entr_model with X_test passed to it, and assign the result to a variable y_pred
-y_pred = entr_model.predict(X_test)
+y_pred = entr_model.predict(X_test.values.reshape(-1, 1))
 
 # Call Series on our y_pred variable with the following: pd.Series(y_pred)
 y_pred = pd.Series(y_pred)
