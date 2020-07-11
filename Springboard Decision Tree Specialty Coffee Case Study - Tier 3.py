@@ -193,7 +193,7 @@ NOPrediction['Decision'].describe()
 # %% codecell
 # Exploring our new NOPrediction dataset
 # Make a boxplot on NOPrediction where the x axis is Decision, and the y axis is spent_last_week
-sns.boxplot(x=NoPrediction['Decision'], y=NoPrediction['spent_last_week'])
+sns.boxplot(x=NOPrediction['Decision'], y=NOPrediction['spent_last_week'])
 plt.title('Boxplot_DecisionVSspent_last_week')
 plt.savefig('figures/Boxplot_DecisionVSspent_last_week.png')
 plt.show()
@@ -203,7 +203,7 @@ plt.show()
 # Also, the customers that answered yes tend to make more expensive purchases.
 # %% codecell
 # Make a scatterplot on NOPrediction, where x is distance, y is spent_last_month and hue is Decision
-sns.scatterplot(x=NoPrediction['Distance'], y=NoPrediction['spent_last_month'], hue=NoPrediction['Decision'])
+sns.scatterplot(x=NOPrediction['Distance'], y=NOPrediction['spent_last_month'], hue=NOPrediction['Decision'])
 plt.title('scatterplot_DistanceVSspent_last_month')
 plt.savefig('figures/scatterplot_DistanceVSspent_last_month.png')
 plt.show()
@@ -249,10 +249,10 @@ X_train, y_train, X_test, y_test = train_test_split(X, y, test_size=0.25, random
 # %% codecell
 # One-hot encode all features in training set.
 X_train = pd.get_dummies(X_train)
-y_train = pd.get_dummies(y_train)
 # y_train = pd.get_dummies(y_train)
 # Do the same, but for X_test
 X_test = pd.get_dummies(X_test)
+
 
 # %% markdown
 # # 3. Modeling
@@ -273,29 +273,29 @@ X_test = pd.get_dummies(X_test)
 # The first model will be the hardest. Persevere and you'll reap the rewards: you can use almost exactly the same code for the other models.
 # %% codecell
 # Declare a variable called entr_model and use tree.DecisionTreeClassifier.
-y_train.info()
 entr_model = tree.DecisionTreeClassifier(criterion="entropy", random_state = 1234)
 # Call fit() on entr_model
-X_train.info()
 entr_model.fit(X_train, y_train)
-X_train.head()
 # Call predict() on entr_model with X_test passed to it, and assign the result to a variable y_pred
-_ _ _
+y_pred = entr_model.predict(X_test)
 
 # Call Series on our y_pred variable with the following: pd.Series(y_pred)
-_ _ _
+y_pred = pd.Series(y_pred)
 
 # Check out entr_model
 entr_model
 # %% codecell
 # Now we want to visualize the tree
-_ _ _
+dot_data = StringIO()
+tree.export_graphviz(entr_model2, out_file=dot_data,
+                filled=True, rounded=True,
+                special_characters=True, feature_names=X_train.columns,class_names = ["NO", "YES"])
 
 # We can do so with export_graphviz
-_ _ _
-
+graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+Image(graph.create_png())
 # Alternatively for class_names use entr_model.classes_
-_ _ _
+entr_model.classes_
 # %% markdown
 # ## Model 1: Entropy model - no max_depth: Interpretation and evaluation
 # %% codecell
