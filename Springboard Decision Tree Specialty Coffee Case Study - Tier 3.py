@@ -234,10 +234,12 @@ features = ["Age", "Gender", "num_coffeeBags_per_year", "spent_last_week", "spen
        "Salary", "Distance", "Online"]
 
 # Make an explanatory variable called X, and assign it: NoPrediction[features]
+
 X = NOPrediction[features]
+X.head()
 
 # Make a dependent variable called y, and assign it: NoPrediction.Decision
-y = NOPrediction.Decision
+y = NOPrediction['Decision']
 # %% markdown
 # ### 4. Further divide those subsets into train and test subsets for X and y respectively: X_train, X_test, y_train, y_test
 # %% codecell
@@ -275,7 +277,8 @@ X_test = pd.get_dummies(X_test)
 # Declare a variable called entr_model and use tree.DecisionTreeClassifier.
 entr_model = tree.DecisionTreeClassifier(criterion="entropy", random_state = 1234)
 # Call fit() on entr_model
-entr_model.fit(X_train, y_train)
+entr_model.fit(X_train.astype(str).iloc[0:119], y_train.astype(str))
+
 # Call predict() on entr_model with X_test passed to it, and assign the result to a variable y_pred
 y_pred = entr_model.predict(X_test)
 
